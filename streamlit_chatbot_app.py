@@ -126,7 +126,7 @@ class MLChatbot:
             augmented_query = self.augment_query(contexts, query)
             self.generate_assistant_response(augmented_query)
         with st.sidebar:
-            self.print_markdown_from_file("Langchain application\\tutorials.md")
+            self.print_markdown_from_file("tutorials.md")
 
 if __name__ == "__main__":
     chatbot = MLChatbot()
