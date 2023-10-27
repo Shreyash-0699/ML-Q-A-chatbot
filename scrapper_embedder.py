@@ -11,15 +11,12 @@ import pinecone
 import toml
 import cloudscraper
 from bs4 import BeautifulSoup, Comment
-import os
-from dotenv import load_dotenv
+import streamlit as st
 
-load_dotenv()
-
-openai_api_key = os.getenv('OPENAI_API_KEY')
-pinecone_api_key = os.getenv('PINECONE_KEY')
-pinecone_index = os.getenv('INDEX_NAME')
-pinecone_env = os.getenv('PINECONE_ENV')
+openai_api_key = st.secrets["my_secrets"]["OPENAI_API_KEY"]
+pinecone_api_key = st.secrets["my_secrets"]["PINECONE_KEY"]
+pinecone_index = st.secrets["my_secrets"]["INDEX_NAME"]
+pinecone_env = st.secrets["my_secrets"]["PINECONE_ENV"]
 
 class SitemapScraper:
     def scrape_sitemap(self, sitemaps):
