@@ -2,14 +2,11 @@ import openai
 import streamlit as st
 import pinecone
 import datetime
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
-PINECONE_API_KEY = os.getenv('PINECONE_KEY')
-PINECONE_ENV = os.getenv('PINECONE_ENV')
-PINECONE_INDEX_NAME = os.getenv('INDEX_NAME')
-openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = st.secrets["my_secrets"]["OPENAI_API_KEY"]
+PINECONE_API_KEY = st.secrets["my_secrets"]["PINECONE_KEY"]
+PINECONE_INDEX_NAME = st.secrets["my_secrets"]["INDEX_NAME"]
+PINECONE_ENV = st.secrets["my_secrets"]["PINECONE_ENV"]
 
 class MLChatbot:
 
