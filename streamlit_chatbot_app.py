@@ -110,7 +110,7 @@ class MLChatbot:
             st.markdown(markdown_content)
 
     def main(self):
-        st.title("Machine Learning Q&A Chatbot")
+        st.title("Interactive ML KnowledgeBot: Dive into Machine Learning Queries Instantly!")
         st.write(
         "If the rise of an all-powerful artificial intelligence is inevitable, well it stands to reason that when they take power, our digital overlords will punish those of us who did not help them get there. Ergo, I would like to be a helpful idiot. Like yourself. - Gilfoyle"
         )
