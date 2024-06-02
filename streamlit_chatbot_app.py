@@ -1,4 +1,5 @@
 import openai
+from openai import OpenAI
 import streamlit as st
 import pinecone
 import datetime
@@ -7,6 +8,8 @@ openai.api_key = st.secrets["my_secrets"]["OPENAI_API_KEY"]
 PINECONE_API_KEY = st.secrets["my_secrets"]["PINECONE_KEY"]
 PINECONE_INDEX_NAME = st.secrets["my_secrets"]["INDEX_NAME"]
 PINECONE_ENV = st.secrets["my_secrets"]["PINECONE_ENV"]
+
+client = OpenAI(api_key = st.secrets["my_secrets"]["OPENAI_API_KEY"])
 
 class MLChatbot:
 
@@ -29,7 +32,7 @@ class MLChatbot:
     @staticmethod
     def get_query_embedding(query):
         # Embed the query using OpenAI's text-embedding-ada-002 engine 
-        query_embedding = openai.Embedding.create(
+        query_embedding = client.embeddings.create(
             input=[query], engine="text-embedding-ada-002"
         )["data"][0]["embedding"]
 
