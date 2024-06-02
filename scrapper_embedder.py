@@ -7,6 +7,7 @@ from uuid import uuid4
 from tqdm.auto import tqdm
 import tiktoken
 import openai
+from openai import OpenAI
 import pinecone
 import toml
 import cloudscraper
@@ -17,6 +18,8 @@ openai_api_key = st.secrets["my_secrets"]["OPENAI_API_KEY"]
 pinecone_api_key = st.secrets["my_secrets"]["PINECONE_KEY"]
 pinecone_index = st.secrets["my_secrets"]["INDEX_NAME"]
 pinecone_env = st.secrets["my_secrets"]["PINECONE_ENV"]
+
+client = OpenAI(api_key=openai_api_key)
 
 class SitemapScraper:
     def scrape_sitemap(self, sitemaps):
@@ -158,7 +161,7 @@ class DataLoader:
             # create embeddings (try-except added to avoid RateLimitError)
             while not success and attempts < self.MAX_RETRIES: 
                 try: 
-                    res = openai.Embedding.create(input=texts, engine=embed_model)
+                    res = client.embeddings.create(input=texts, engine=embed_model)
                     success = True
                 except: 
                     attempts += 1
