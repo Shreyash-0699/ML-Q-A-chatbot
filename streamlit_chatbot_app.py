@@ -10,7 +10,7 @@ PINECONE_ENV = st.secrets["my_secrets"]["PINECONE_ENV"]
 
 class MLChatbot:
 
-    def __init__(self, limit = 3750):
+    def __init__(self, limit = 3250):
         self.limit = limit
 
     def display_existing_messages(self):
@@ -87,7 +87,7 @@ class MLChatbot:
             message_placeholder = st.empty()
             full_response = ""
             for response in openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-3.5-turbo-0125",
                 temperature=0,
                 messages=[
                     {"role": "system", "content": primer},
