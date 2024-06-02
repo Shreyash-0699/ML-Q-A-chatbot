@@ -2,14 +2,17 @@ import openai
 from openai import OpenAI
 import streamlit as st
 import pinecone
+from pinecone import Pinecone, ServerlessSpec
 import datetime
 
 openai.api_key = st.secrets["my_secrets"]["OPENAI_API_KEY"]
 PINECONE_API_KEY = st.secrets["my_secrets"]["PINECONE_KEY"]
 PINECONE_INDEX_NAME = st.secrets["my_secrets"]["INDEX_NAME"]
 PINECONE_ENV = st.secrets["my_secrets"]["PINECONE_ENV"]
+PINECONE_HOST = st.secrets["my_secrets"]["PINECONE_HOST"]
 
 client = OpenAI(api_key = st.secrets["my_secrets"]["OPENAI_API_KEY"])
+pinecone_client = Pinecone(api_key = PINECONE_API_KEY)
 
 class MLChatbot:
 
@@ -32,18 +35,21 @@ class MLChatbot:
     @staticmethod
     def get_query_embedding(query):
         # Embed the query using OpenAI's text-embedding-ada-002 engine 
-        query_embedding = client.embeddings.create(
-            input=[query], engine="text-embedding-ada-002"
-        )["data"][0]["embedding"]
+        query_embedding = (
+            client.embeddings.create(input=[query], model="text-embedding-ada-002")
+            .data[0]
+            .embedding
+        )
 
         return query_embedding
     
     
-    def get_relevant_contexts(self, query_embedding, index): 
+    def get_relevant_contexts(self, query_embedding, index_name): 
+
+        # Connect to the existing index
+        index = pinecone_client.Index(index_name=index_name, host=PINECONE_HOST)
         
-        pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENV)
-        index = pinecone.Index(index_name=index)
-        res = index.query(query_embedding, top_k=8, include_metadata=True)
+        res = index.query(vector = query_embedding, top_k=6, include_metadata=True)
         contexts = []
         for item in res["matches"]:
             metadata = item["metadata"]
@@ -89,7 +95,7 @@ class MLChatbot:
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-            for response in openai.ChatCompletion.create(
+            for response in client.chat.completions.create(
                 model="gpt-3.5-turbo-0125",
                 temperature=0,
                 messages=[
@@ -98,7 +104,8 @@ class MLChatbot:
                 ],
                 stream=True,
             ):
-                full_response += response.choices[0].delta.get("content", "")
+                if partial_response := response.choices[0].delta.content:
+                    full_response += partial_response
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
 
@@ -122,7 +129,7 @@ class MLChatbot:
         if query: 
             self.add_user_message_to_session(query)
             query_embedding = self.get_query_embedding(query)
-            contexts = self.get_relevant_contexts(query_embedding, index=PINECONE_INDEX_NAME)
+            contexts = self.get_relevant_contexts(query_embedding, index_name=PINECONE_INDEX_NAME)
             augmented_query = self.augment_query(contexts, query)
             self.generate_assistant_response(augmented_query)
         with st.sidebar:
